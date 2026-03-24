@@ -32,6 +32,12 @@ export default function UserData() {
     const endIndex = startIndex + itemsPerPage;
     const currentItems = userList.slice(startIndex, endIndex);
 
+    // Pagination with dots
+    const getPageNumbers = () => {
+        return Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter(page => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1);
+    }
+
     if (loader) {
         return (
             <div className="flex items-center justify-center py-20 text-gray-400">
@@ -79,7 +85,11 @@ export default function UserData() {
                                         className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover"
                                     />
                                 </td>
-                                <td className="px-3 sm:px-6 py-3">{item.firstName}</td>
+                                <td className="px-3 sm:px-6 py-3">
+                                    <p className="font-medium text-gray-800">{item.firstName}</p>
+                                    <p className="sm:hidden text-gray-400 mt-0.5">{item.lastName}</p>
+                                    <p className="md:hidden text-gray-400 mt-0.5">{item.birthDate}</p>
+                                </td>
                                 <td className="hidden sm:table-cell px-3 sm:px-6 py-3">{item.lastName}</td>
                                 <td className="px-3 sm:px-6 py-3">{item.age}</td>
                                 <td className="hidden md:table-cell px-3 sm:px-6 py-3">{item.birthDate}</td>
@@ -102,18 +112,22 @@ export default function UserData() {
                     >
                         ← Prev
                     </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                        <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg border transition ${
-                                currentPage === page
-                                    ? 'bg-cyan-500 text-white border-cyan-500'
-                                    : 'border-gray-200 text-gray-600 hover:bg-cyan-50'
-                            }`}
-                        >
-                            {page}
-                        </button>
+                    {getPageNumbers().map((page, idx, arr) => (
+                        <React.Fragment key={page}>
+                            {idx > 0 && arr[idx - 1] !== page - 1 && (
+                                <span className="px-1 py-1.5 text-gray-400 text-xs sm:text-sm">...</span>
+                            )}
+                            <button
+                                onClick={() => setCurrentPage(page)}
+                                className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg border transition ${
+                                    currentPage === page
+                                        ? 'bg-cyan-500 text-white border-cyan-500'
+                                        : 'border-gray-200 text-gray-600 hover:bg-cyan-50'
+                                }`}
+                            >
+                                {page}
+                            </button>
+                        </React.Fragment>
                     ))}
                     <button
                         onClick={() => setCurrentPage(currentPage + 1)}

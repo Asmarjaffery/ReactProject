@@ -27,6 +27,12 @@ export default function ProductData() {
     const endIndex = startIndex + itemsPerPage;
     const currentItems = productList.slice(startIndex, endIndex);
 
+    // Pagination with dots
+    const getPageNumbers = () => {
+        return Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter(page => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1);
+    }
+
     if (loading) {
         return (
             <div className="flex items-center justify-center py-20">
@@ -70,7 +76,13 @@ export default function ProductData() {
                                 <td className="px-3 sm:px-6 py-3">
                                     <img src={item.thumbnail} alt={item.title} className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
                                 </td>
-                                <td className="px-3 sm:px-6 py-3 font-semibold text-gray-800 max-w-[120px] sm:max-w-xs truncate">{item.title}</td>
+                                <td className="px-3 sm:px-6 py-3 max-w-[120px] sm:max-w-xs">
+                                    <p className="font-semibold text-gray-800 truncate">{item.title}</p>
+                                    <p className="sm:hidden text-gray-400 mt-0.5">{item.brand}</p>
+                                    <p className="md:hidden text-gray-400 mt-0.5">
+                                        Stock: {item.stock} | ⭐ {item.rating}
+                                    </p>
+                                </td>
                                 <td className="hidden sm:table-cell px-3 sm:px-6 py-3 text-gray-500">{item.brand}</td>
                                 <td className="px-3 sm:px-6 py-3 font-semibold text-teal-600">${item.price}</td>
                                 <td className="hidden md:table-cell px-3 sm:px-6 py-3 text-gray-600">{item.stock}</td>
@@ -94,17 +106,21 @@ export default function ProductData() {
                     >
                         ← Prev
                     </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                        <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg border transition ${currentPage === page
-                                ? 'bg-teal-500 text-white border-teal-500'
-                                : 'border-gray-200 text-gray-600 hover:bg-teal-50'
-                                }`}
-                        >
-                            {page}
-                        </button>
+                    {getPageNumbers().map((page, idx, arr) => (
+                        <React.Fragment key={page}>
+                            {idx > 0 && arr[idx - 1] !== page - 1 && (
+                                <span className="px-1 py-1.5 text-gray-400 text-xs sm:text-sm">...</span>
+                            )}
+                            <button
+                                onClick={() => setCurrentPage(page)}
+                                className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm rounded-lg border transition ${currentPage === page
+                                    ? 'bg-teal-500 text-white border-teal-500'
+                                    : 'border-gray-200 text-gray-600 hover:bg-teal-50'
+                                    }`}
+                            >
+                                {page}
+                            </button>
+                        </React.Fragment>
                     ))}
                     <button
                         onClick={() => setCurrentPage(currentPage + 1)}
